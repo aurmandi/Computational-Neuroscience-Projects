@@ -20,4 +20,4 @@ Criticality Mapping: Constructed a Bifurcation Diagram to identify the Hopf Bifu
 Focus: Investigating visual cortex alpha rhythms (8-12 Hz) across eyes-open and eyes-closed states.  
 Goal: Testing the "cortical idling" hypothesis where alpha power increases during eyes-closed states.  
 Techniques: Power Spectral Density (PSD) calculation using Welch’s method and T-test statistical verification in MATLAB. 
-![EEG Alpha Power Analysis](./EEG-Alpha-Spectral-Analysis/EEG_Spectral_Analysis_Results.jpg)
+![EEG Alpha Power Analysis](./Spectral Analysis/EEG Spectral Analysis Results.jpg
