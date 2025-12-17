@@ -8,6 +8,8 @@ Key Aim: Quantifying stimulus identity decoding reliability using population act
 Methods: Logistic Regression for stimulus decoding, PCA for temporal dynamics, and Event-Triggered Averages (ETA) to distinguish Sst-inhibitory neuron tuning from excitatory populations.  
 Findings: Established that V1 populations provide a highly reliable code for stimulus identity and demonstrated functional specialization in Sst-inhibitory neurons.  
 
+Data provided by the Allen Institute for Brain Science (2023). Visual Behavior 2P Project. Available from: portal.brain-map.org
+
 ### 2. Seizure Dynamics via Wilson-Cowan Modeling (December 2024)
 Focus: Investigating neural stability and the "Edge of Chaos" using dynamical systems theory.  
 Methodology: Implementation of coupled differential equations (Runge-Kutta method) to model excitatory-inhibitory (E-I) interactions.  
@@ -17,4 +19,4 @@ Criticality Mapping: Constructed a Bifurcation Diagram to identify the Hopf Bifu
 ### 3. EEG Spectral Analysis of Alpha Rhythms (December 2024)
 Focus: Investigating visual cortex alpha rhythms (8-12 Hz) across eyes-open and eyes-closed states.  
 Goal: Testing the "cortical idling" hypothesis where alpha power increases during eyes-closed states.  
-Techniques: Power Spectral Density (PSD) calculation using Welch’s method and T-test statistical verification in MATLAB.  
+Techniques: Power Spectral Density (PSD) calculation using Welch’s method and T-test statistical verification in MATLAB. 
