@@ -3,7 +3,7 @@ This repository features a collection of projects exploring neural dynamics, spe
 
 ## Projects Overview
 ### 1. Neural Decoding in the Allen Visual Behavior Dataset
-Focus: Population decoding and cell-type selectivity in the mouse Primary Visual Cortex (V1).
+Focus: Population decoding and cell-type selectivity in the mouse Primary Visual Cortex (V1). 
 Key Aim: Quantifying stimulus identity decoding reliability using population activity.
 Methods: Logistic Regression for stimulus decoding, PCA for temporal dynamics, and Event-Triggered Averages (ETA) to distinguish Sst-inhibitory neuron tuning from excitatory populations.
 Findings: Established that V1 populations provide a highly reliable code for stimulus identity and demonstrated functional specialization in Sst-inhibitory neurons.
