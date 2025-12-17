@@ -1,0 +1,225 @@
+%% EEG Spectral Analysis Project: Visual Cortex Alpha Rhythms
+% -------------------------------------------------------------------------
+% Project Goal: Investigate how the strength of the alpha rhythm (8-12 Hz)
+% changes in the visual cortex between eyes-open and eyes-closed states.
+% Alpha power is hypothesized to be higher during eyes-closed states,
+% reflecting "cortical idling" or inhibition of visual processing.
+
+% Dec 2024 - Arman was here!
+% -------------------------------------------------------------------------
+
+clear; close all; clc;
+
+% We assume trials 1-30 are eyes-open 
+% and 31-60 are eyes-closed.
+
+
+
+ % Generating simulated data for demonstration
+    fs = 1000;              % Sampling frequency (Hz)
+    T = 2;                  % Trial duration in seconds
+    t = 0:1/fs:T-1/fs;      % Time vector
+    num_channels = 32;      % Standard EEG channels
+    num_trials = 60;        % 30 eyes open, 30 eyes closed
+    
+    % Simulate data: base noise + a stronger 10 Hz alpha component for eyes closed
+    eeg_data = randn(num_channels, length(t), num_trials) * 5; % Noise
+    
+    % Add alpha to visual channels (e.g., channel 30 is Oz)
+    alpha_freq = 10;
+    
+    % Eyes Closed Trials (31-60): Strong Alpha
+    alpha_wave_closed = 15 * sin(2*pi*alpha_freq*t); 
+    eeg_data(30, :, 31:60) = eeg_data(30, :, 31:60) + repmat(alpha_wave_closed, 1, 1, 30);
+    
+    % Eyes Open Trials (1-30): Weak Alpha
+    alpha_wave_open = 5 * sin(2*pi*alpha_freq*t); 
+    eeg_data(30, :, 1:30) = eeg_data(30, :, 1:30) + repmat(alpha_wave_open, 1, 1, 30);
+    
+    fprintf('--- Simulated Data Used ---\n');
+
+
+% Core Parameters
+fs = 1000; % Sampling frequency (Hz)
+visual_channel_index = 30; % Index for a representative visual cortex electrode (e.g., Oz)
+
+fprintf('EEG Data Loaded: %d channels, %d time points, %d trials\n', ...
+        size(eeg_data, 1), size(eeg_data, 2), size(eeg_data, 3));
+fprintf('Analyzing Alpha Rhythms at Channel Index: %d\n', visual_channel_index);
+
+disp('-----------------------------------------------------------');
+
+
+
+% Plotting the raw signal helps us sanity-check the data quality and look 
+% for large artifacts before computing spectral estimates.
+
+figure('Position', [100, 100, 1400, 800], 'Name', 'EEG Spectral Analysis Results');
+
+% Time axis creation
+time_axis = (0:size(eeg_data,2)-1)/fs;
+
+% 2A. Plot a single trial of the visual channel
+subplot(2, 3, 1);
+plot(time_axis, eeg_data(visual_channel_index, :, 1)); % First trial, visual channel
+xlabel('Time (s)'); ylabel('Amplitude (\muV)');
+title('Raw EEG - Single Eyes Open Trial');
+grid on;
+
+% 2B. Plot multiple trials to see trial-to-trial variability
+subplot(2, 3, 2);
+plot(time_axis, squeeze(eeg_data(visual_channel_index, :, 1:5))); % First 5 trials
+xlabel('Time (s)'); ylabel('Amplitude (\muV)');
+title('Raw EEG - First 5 Trials Overlay');
+grid on;
+
+disp('Raw data visualized. Proceeding to spectral analysis...');
+disp('-----------------------------------------------------------');
+
+
+
+
+subplot(2, 3, 3);
+
+% FFT Parameters
+L = size(eeg_data, 2);             % Length of signal
+NFFT = 2^nextpow2(L);              % Next power of 2 length
+f = fs/2*linspace(0,1,NFFT/2+1);   % Frequency vector
+
+% Calculate FFT for Eyes Open (Mean across trials first)
+Y_open = fft(mean(eeg_data(visual_channel_index, :, 1:30), 3), NFFT)/L;
+psd_open = 2*abs(Y_open(1:NFFT/2+1));
+
+% Calculate FFT for Eyes Closed
+Y_closed = fft(mean(eeg_data(visual_channel_index, :, 31:60), 3), NFFT)/L;
+psd_closed = 2*abs(Y_closed(1:NFFT/2+1));
+
+% Plot
+plot(f, 10*log10(psd_open), 'b-', 'LineWidth', 2); hold on;
+plot(f, 10*log10(psd_closed), 'r-', 'LineWidth', 2);
+
+% Highlight Alpha Band
+alpha_bounds = [8, 12];
+ylim_val = ylim;
+fill([alpha_bounds(1), alpha_bounds(1), alpha_bounds(2), alpha_bounds(2)], ...
+     [ylim_val(1), ylim_val(2), ylim_val(2), ylim_val(1)], ...
+     'y', 'FaceAlpha', 0.2, 'EdgeColor', 'none');
+
+xlabel('Frequency (Hz)'); ylabel('Power (dB)');
+title('Power Spectral Density (Standard FFT)');
+legend('Eyes Open', 'Eyes Closed', 'Alpha Band');
+xlim([1, 30]); grid on;
+
+
+% Spectrogram shows how frequency power changes over time within a trial.
+% This is essential for time-locked analyses (e.g., responses to a stimulus).
+
+subplot(2, 3, 4);
+
+% Define parameters for spectrogram (ensure these are set)
+window_len = 256;       % Window length
+window = hamming(window_len); 
+noverlap = 128;         % 50% overlap (256 / 2)
+nfft = 512;             % Number of FFT points
+
+% Compute spectrogram for a single eyes-closed trial
+[s, f, t] = spectrogram(eeg_data(visual_channel_index, :, 31), window, noverlap, nfft, fs);
+
+% Plot spectrogram
+imagesc(t, f, 10*log10(abs(s))); % Convert to power in dB
+axis xy; % Correct orientation: time on x, frequency on y
+xlabel('Time (s)'); ylabel('Frequency (Hz)');
+title('Spectrogram - Single Eyes Closed Trial');
+colorbar; 
+clim([-20, 20]); % Set a consistent color scale for power
+ylim([1, 30]);
+
+% Add alpha band reference lines
+hold on; 
+plot(xlim, [alpha_bounds(1), alpha_bounds(1)], 'w--', 'LineWidth', 1);
+plot(xlim, [alpha_bounds(2), alpha_bounds(2)], 'w--', 'LineWidth', 1);
+
+disp('Spectrogram computed. Look for sustained power in the alpha band.');
+disp('-----------------------------------------------------------');
+
+
+% We quantify the specific alpha band power for statistical comparison.
+
+subplot(2, 3, 5);
+
+% Parameters from previous section
+window_fun = hamming(256); 
+noverlap_val = 128;       
+nfft_val = 512;
+
+% 1. Extract Alpha Power
+% Pre-allocate arrays to store mean alpha power per trial
+num_trials_cond = 30;
+alpha_power_open = zeros(num_trials_cond, 1);
+alpha_power_closed = zeros(num_trials_cond, 1);
+
+for trial = 1:num_trials_cond
+    % Eyes Open Trials (1-30)
+    [psd_o, f] = pwelch(eeg_data(visual_channel_index, :, trial), window_fun, noverlap_val, nfft_val, fs);
+    alpha_band_indices = f >= alpha_bounds(1) & f <= alpha_bounds(2);
+    alpha_power_open(trial) = mean(psd_o(alpha_band_indices)); 
+    
+    % Eyes Closed Trials (31-60)
+    [psd_c, f] = pwelch(eeg_data(visual_channel_index, :, trial+30), window_fun, noverlap_val, nfft_val, fs);
+    alpha_band_indices = f >= alpha_bounds(1) & f <= alpha_bounds(2);
+    alpha_power_closed(trial) = mean(psd_c(alpha_band_indices));
+end
+
+% 2. Calculate Statistics (Mean and SEM)
+means = [mean(alpha_power_open), mean(alpha_power_closed)];
+stds = [std(alpha_power_open), std(alpha_power_closed)];
+n = [length(alpha_power_open), length(alpha_power_closed)];
+sems = stds ./ sqrt(n); % Standard Error of the Mean
+
+% 3. Visualization: Bar Chart with Error Bars
+b = bar(1:2, means);
+b.FaceColor = 'flat';
+b.CData(1,:) = [0 0.4470 0.7410]; % Standard MATLAB Blue
+b.CData(2,:) = [0.8500 0.3250 0.0980]; % Standard MATLAB Red
+hold on;
+
+% Add Error Bars
+errorbar(1:2, means, sems, 'k.', 'LineWidth', 2);
+
+% Formatting
+set(gca, 'XTick', 1:2, 'XTickLabel', {'Eyes Open', 'Eyes Closed'});
+ylabel('Alpha Power (µV^2/Hz)');
+title('Mean Alpha Power (\pmSEM)');
+grid on;
+
+% 4. Manual T-Test Calculation (Welch's t-test approximation)
+% t = (mean1 - mean2) / sqrt(var1/n1 + var2/n2)
+t_stat = (means(1) - means(2)) / sqrt(stds(1)^2/n(1) + stds(2)^2/n(2));
+
+% Degrees of freedom (Satterthwaite approximation for unequal variances)
+df_num = (stds(1)^2/n(1) + stds(2)^2/n(2))^2;
+df_den = (stds(1)^2/n(1))^2/(n(1)-1) + (stds(2)^2/n(2))^2/(n(2)-1);
+df = df_num / df_den;
+
+% P-value calculation using incomplete beta function (base MATLAB)
+% This computes the two-tailed p-value
+x = df / (df + t_stat^2);
+p_value = betainc(x, df/2, 0.5);
+
+fprintf('\nStatistical Test (Manual T-Test): Eyes Open vs. Eyes Closed\n');
+fprintf('T-statistic: %.4f, Degrees of Freedom: %.2f\n', t_stat, df);
+fprintf('P-value: p = %.4e\n', p_value);
+
+if p_value < 0.05
+    fprintf('Result: Significant Difference (p < 0.05). Alpha power increases when eyes are closed.\n');
+else
+    fprintf('Result: No Significant Difference found.\n');
+end
+
+disp('-----------------------------------------------------------');
+
+%% Project Conclusion
+% The findings (a significant increase in alpha power over visual cortex 
+% when eyes are closed) support the idea that alpha oscillations are a key 
+% mechanism for internally modulating sensory processing, effectively 
+% "gating" visual input when it is not needed.
