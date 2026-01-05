@@ -30,7 +30,7 @@ This project utilizes **Dynamical Systems Theory** to simulate the interactions 
 #### Focus: Investigating visual cortex alpha rhythms (8-12 Hz) across eyes-open and eyes-closed states.  
 #### Goal: Testing the "cortical idling" hypothesis where alpha power increases during eyes-closed states.  
 
-note: "cortical idling" hypothesis has been long rejected and mothern view of "inhibition" is now the dominant view; this means that the brain uses alpha oscillations to actively suppress specific regions. For example, if you are focusing intensely on a sound, alpha power often increases in your visual cortex to make sure visual distractions don't interfere with your hearing.  
+note: "cortical idling" hypothesis has been long rejected and modern view of "inhibition" is now the dominant view; this means that the brain uses alpha oscillations to actively suppress specific regions. For example, if you are focusing intensely on a sound, alpha power often increases in your visual cortex to make sure visual distractions don't interfere with your hearing.  
 In this small project I simulated the alpha data using the original data used in earlier literature, and the purpose was to apply Spectral Analysis.  
 #### Techniques: Power Spectral Density (PSD) calculation using Welch’s method and T-test statistical verification in MATLAB. 
 ![EEG Alpha Power Analysis](./Spectral%20Analysis/EEG%20Spectral%20Analysis%20Results.jpg)
