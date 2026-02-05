@@ -2,7 +2,7 @@
 This repository features a collection of projects exploring neural dynamics, spectral analysis, and stimulus decoding using various computational methods.
 
 ## Projects Overview
-## 1. Neural Decoding in the Allen Visual Behavior Dataset (March 2025)
+## 1. State-Dependent Visual Coding in the Allen Visual Behavior Dataset (March 2025)
 This Neuromatch tutorial project contains a computational analysis pipeline designed to dissect how behavioral states such as locomotion, task engagement, and novelty reshape neural coding in the mouse visual cortex. Using the Allen Brain Observatory dataset, I've modeled the interaction between behavioral variables and cell-type specific neural dynamics.
 #### Aims:
 ![Visual Dynamics Analysis](Neuromatch-Visual%20Dynamics/Effects_of_stimulus_context_and_behavior_state_on_visual_representation.png)
